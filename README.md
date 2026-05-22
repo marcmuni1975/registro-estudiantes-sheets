@@ -28,43 +28,51 @@ bbdd/
 
 ---
 
-## 🛠️ Configuración Paso a Paso de Google Sheets
+## 🛠️ Configuración de Google Sheets (¡Método Autoinstalable Automático!)
 
-Para activar el almacenamiento de datos automático en tu cuenta personal de Google Sheets, sigue estos sencillos pasos:
+Para activar el almacenamiento de datos automático en tu cuenta de Google Drive, sigue estos sencillos pasos:
 
-### Paso 1: Crear la Hoja de Cálculo
-1. Ve a [Google Sheets](https://sheets.google.com) y crea una hoja de cálculo en blanco con el nombre: `Registro de Estudiantes`.
-2. En la primera fila (Fila 1), crea los siguientes encabezados en orden exacto:
-    *   **A1**: `Fecha`
-    *   **B1**: `Nombre Completo`
-    *   **C1**: `Curso/Grado`
-    *   **D1**: `Nombre del Apoderado`
-    *   **E1**: `Teléfono de Contacto`
-    *   **F1**: `Correo Electrónico`
-    *   **G1**: `Observaciones`
-
-### Paso 2: Configurar Google Apps Script
-1. En el menú superior de la hoja de cálculo, haz clic en **Extensiones** -> **Apps Script**.
-2. Borra todo el código autogenerado del editor y pega el siguiente script:
+### Paso 1: Configurar Google Apps Script (De forma independiente)
+1. Ve a [Google Apps Script](https://script.google.com) (inicia sesión con tu cuenta de Google).
+2. Haz clic en el botón azul **Nuevo proyecto** (New project).
+3. Borra todo el código autogenerado del editor y pega el siguiente script:
 
 ```javascript
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var props = PropertiesService.getScriptProperties();
+  var sheetId = props.getProperty("SHEET_ID");
+  var ss;
   
   try {
-    var data = JSON.parse(e.postData.contents);
-    
-    // Validar datos mínimos
-    if (!data.nombreCompleto) {
-      return ContentService.createTextOutput(JSON.stringify({
-        "status": "error",
-        "message": "Falta el nombre completo del estudiante"
-      })).setMimeType(ContentService.MimeType.JSON);
+    // 1. Si es la primera vez, el script crea la hoja automáticamente en tu Google Drive
+    if (!sheetId) {
+      ss = SpreadsheetApp.create("Registro de Estudiantes Automático");
+      var firstSheet = ss.getActiveSheet();
+      
+      // Escribimos los encabezados de forma automática
+      firstSheet.appendRow([
+        "Fecha", 
+        "Nombre Completo", 
+        "Curso/Grado", 
+        "Nombre del Apoderado", 
+        "Teléfono de Contacto", 
+        "Correo Electrónico", 
+        "Observaciones"
+      ]);
+      
+      // Guardamos el ID de la hoja en la memoria del script para futuros registros
+      props.setProperty("SHEET_ID", ss.getId());
+    } else {
+      // Si ya existe, simplemente la abrimos por su ID guardado
+      ss = SpreadsheetApp.openById(sheetId);
     }
     
-    // Agregar fila a la hoja
+    var sheet = ss.getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    // 2. Insertamos la información del estudiante
     sheet.appendRow([
-      new Date(), // Fecha y hora del registro
+      new Date(),
       data.nombreCompleto,
       data.curso,
       data.apoderado,
@@ -73,10 +81,10 @@ function doPost(e) {
       data.observaciones || ""
     ]);
     
-    // Configurar cabeceras CORS
     return ContentService.createTextOutput(JSON.stringify({
       "status": "success",
-      "message": "Datos guardados correctamente"
+      "message": "Datos guardados correctamente",
+      "sheetUrl": ss.getUrl()
     }))
     .setMimeType(ContentService.MimeType.JSON)
     .setHeader("Access-Control-Allow-Origin", "*")
@@ -93,7 +101,7 @@ function doPost(e) {
   }
 }
 
-// Habilitar soporte para CORS preflight (OPTIONS)
+// Soporte para solicitudes CORS preflight
 function doOptions(e) {
   return ContentService.createTextOutput("")
     .setHeader("Access-Control-Allow-Origin", "*")
@@ -102,24 +110,24 @@ function doOptions(e) {
 }
 ```
 
-3. Guarda los cambios haciendo clic en el icono de **Guardar (disco)** en la parte superior.
+4. Haz clic en el icono del **Disco Floppy 💾 (Guardar)** en la parte superior.
 
-### Paso 3: Desplegar la Web App (API)
-1. En la parte superior derecha del editor, haz clic en **Implementar** (Deploy) -> **Nueva implementación** (New deployment).
+### Paso 2: Desplegar la Web App (API)
+1. En la esquina superior derecha, haz clic en **Implementar** (Deploy) -> **Nueva implementación** (New deployment).
 2. Haz clic en el icono de engranaje al lado de *Seleccionar tipo* y selecciona **Aplicación web** (Web app).
 3. Rellena las opciones de configuración:
-    *   **Descripción:** `API Registro Colegio`
+    *   **Descripción:** `API Registro Autoinstalable`
     *   **Ejecutar como:** `Tú (tu-correo-de-google@gmail.com)`
-    *   **Quién tiene acceso:** `Cualquiera` *(Esto permite que el formulario se conecte de forma remota sin requerir inicio de sesión de Google de cada usuario).*
+    *   **Quién tiene acceso:** `Cualquiera` (Anyone).
 4. Haz clic en el botón azul **Implementar**.
-5. Google te solicitará **Autorizar acceso**. Haz clic en él, selecciona tu cuenta, luego haz clic en *Configuración Avanzada* (Advanced) -> *Ir a Proyecto (no seguro)* y concede los permisos requerimos para administrar tus hojas de cálculo.
-6. Una vez completado, copia la **URL de la aplicación web** generada (debe terminar en `/exec`).
+5. Google te solicitará **Autorizar acceso**. Haz clic en él, selecciona tu cuenta, luego haz clic en *Configuración Avanzada* (Advanced) -> *Ir a Proyecto (no seguro)* y concede los permisos requerimos para que el script pueda crear archivos en tu Drive.
+6. Copia la **URL de la aplicación web** generada (debe terminar en `/exec`).
 
-### Paso 4: Enlazar con el Frontend
-1. Abre el archivo `index.html` en tu navegador de forma local.
-2. Haz clic en el icono de **Configuración (engranaje)** en la esquina superior derecha de la interfaz.
-3. Pega la URL copiada de Google Apps Script y haz clic en **Guardar Configuración**.
-4. ¡Listo! El banner superior cambiará a color verde indicando que el sistema está conectado. Todos tus registros a partir de ese momento se almacenarán directamente en tu Google Sheet.
+### Paso 3: Enlazar con el Frontend
+1. Abre el archivo `index.html` en tu navegador.
+2. Haz clic en el icono del **Engranaje ⚙️ (Configuración)** en la esquina superior derecha.
+3. Pega la URL copiada y haz clic en **Guardar Configuración**.
+4. ¡Listo! El banner se volverá verde. En tu primer envío, el script creará automáticamente una hoja de cálculo llamada **"Registro de Estudiantes Automático"** en tu Google Drive y empezará a llenarla. No necesitas hacer nada manual en Sheets.
 
 ---
 
