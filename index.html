@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema interactivo para el registro y gestión de estudiantes de colegio con integración directa a Google Sheets.">
+    <meta name="author" content="Antigravity">
+    <title>Colegio Académico - Registro de Estudiantes</title>
+    
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos Principales -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Colegio <span>Académico</span></h1>
+                    <p>Portal de Registro Digital</p>
+                </div>
+            </div>
+            <nav class="header-actions">
+                <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema de color" title="Cambiar tema">
+                    <!-- Icono Sol (Modo Claro) -->
+                    <svg id="theme-sun" class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <!-- Icono Luna (Modo Oscuro) -->
+                    <svg id="theme-moon" class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <button id="btn-open-settings" class="btn-icon" aria-label="Configurar base de datos" title="Configurar API">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Indicador de conexión -->
+        <div id="connection-banner" class="banner banner-warning">
+            <div class="banner-content">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span><strong>Modo Demo Local:</strong> Los datos se guardarán solo en tu navegador. Haz clic en el engranaje superior para ingresar tu URL de Google Sheets.</span>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <!-- Formulario de ingreso -->
+            <section class="card form-card">
+                <div class="card-header">
+                    <h2>Nuevo Registro de Estudiante</h2>
+                    <p>Completa la información para almacenar el registro en la base de datos.</p>
+                </div>
+                <form id="student-form" novalidate>
+                    <div class="form-group">
+                        <label for="student-name">Nombre Completo del Estudiante *</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <input type="text" id="student-name" name="nombreCompleto" placeholder="Ej. Juan Pérez González" required minlength="4">
+                        </div>
+                        <span class="validation-message" id="student-name-error">El nombre debe tener al menos 4 caracteres.</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="student-grade">Curso / Grado *</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                <select id="student-grade" name="curso" required>
+                                    <option value="" disabled selected>Selecciona un curso</option>
+                                    <optgroup label="Educación Básica">
+                                        <option value="1° Básico">1° Básico</option>
+                                        <option value="2° Básico">2° Básico</option>
+                                        <option value="3° Básico">3° Básico</option>
+                                        <option value="4° Básico">4° Básico</option>
+                                        <option value="5° Básico">5° Básico</option>
+                                        <option value="6° Básico">6° Básico</option>
+                                        <option value="7° Básico">7° Básico</option>
+                                        <option value="8° Básico">8° Básico</option>
+                                    </optgroup>
+                                    <optgroup label="Educación Media">
+                                        <option value="1° Medio">1° Medio</option>
+                                        <option value="2° Medio">2° Medio</option>
+                                        <option value="3° Medio">3° Medio</option>
+                                        <option value="4° Medio">4° Medio</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <span class="validation-message" id="student-grade-error">Selecciona un curso válido.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guardian-name">Nombre del Apoderado / Contacto *</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <input type="text" id="guardian-name" name="apoderado" placeholder="Ej. María González (Madre)" required minlength="4">
+                        </div>
+                        <span class="validation-message" id="guardian-name-error">Ingresa el nombre completo del apoderado.</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="guardian-phone">Teléfono de Contacto *</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                <input type="tel" id="guardian-phone" name="telefono" placeholder="+56 9 1234 5678" required pattern="^(\+?\d{1,4}[-.\s]?)?\d{6,14}$">
+                            </div>
+                            <span class="validation-message" id="guardian-phone-error">Ingresa un formato de teléfono válido (ej. +56912345678).</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guardian-email">Correo Electrónico *</label>
+                            <div class="input-wrapper">
+                                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                <input type="email" id="guardian-email" name="email" placeholder="apoderado@correo.com" required>
+                            </div>
+                            <span class="validation-message" id="guardian-email-error">Ingresa una dirección de correo válida.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="student-notes">Observaciones / Detalles Médicos o Especiales</label>
+                        <div class="input-wrapper textarea-wrapper">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            <textarea id="student-notes" name="observaciones" placeholder="Escribe observaciones adicionales (alergias, consideraciones especiales, etc.)" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="action-bar">
+                        <button type="reset" id="btn-clear" class="btn btn-secondary">
+                            Limpiar
+                        </button>
+                        <button type="submit" id="btn-submit" class="btn btn-primary">
+                            <span>Registrar Estudiante</span>
+                            <div class="spinner" id="submit-spinner" aria-hidden="true"></div>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Historial / Lista de registros en caché -->
+            <section class="card table-card">
+                <div class="card-header-table">
+                    <div>
+                        <h2>Registros Recientes</h2>
+                        <p>Lista de estudiantes guardados en esta sesión. Los datos se suben a tu Google Sheet en tiempo real.</p>
+                    </div>
+                    <button id="btn-clear-cache" class="btn btn-danger-link" aria-label="Limpiar historial visual" title="Limpia solo la vista en esta computadora">
+                        Limpiar vista local
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table id="students-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Curso</th>
+                                <th>Apoderado</th>
+                                <th>Contacto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <!-- Filas dinámicas -->
+                            <tr id="empty-state-row">
+                                <td colspan="5" class="empty-state">
+                                    <div class="empty-state-content">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                        <p>No se han registrado estudiantes en esta sesión.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Ventana Modal de Configuración (Dialog) -->
+    <dialog id="settings-dialog" class="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Configuración de Base de Datos</h2>
+                <button id="btn-close-settings" class="btn-close" aria-label="Cerrar modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Para almacenar los registros directamente en tu cuenta de <strong>Google Sheets</strong>, ingresa la URL de la aplicación web que obtuviste de Google Apps Script.</p>
+                
+                <div class="alert alert-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="info-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <div>
+                        <strong>¿Cómo obtenerla?</strong> En Google Sheets ve a <em>Extensiones</em> -> <em>Apps Script</em>. Crea tu código con `doPost()`, impleméntalo como <strong>Aplicación Web</strong> con acceso para <strong>"Cualquiera"</strong>, y copia la URL resultante.
+                    </div>
+                </div>
+
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="api-url">URL de Google Apps Script (Web App)</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                            <input type="url" id="api-url" placeholder="https://script.google.com/macros/s/.../exec" required>
+                        </div>
+                        <span class="validation-message" id="api-url-error">Ingresa una URL válida de script de Google que termine en /exec.</span>
+                    </div>
+
+                    <div class="action-bar modal-actions">
+                        <button type="button" id="btn-reset-api" class="btn btn-danger-link">Quitar conexión</button>
+                        <div class="btn-group-right">
+                            <button type="button" id="btn-cancel-settings" class="btn btn-secondary">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Contenedor para Notificaciones Flotantes (Toasts) -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p>&copy; 2026 Colegio Académico. Sistema de Registro Conectado a Hojas de Cálculo.</p>
+            <div class="footer-meta">
+                <span class="badge" id="meta-status-badge">Modo Demo</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lógica JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
